@@ -1,1 +1,298 @@
+**********************************
+***PAPER CONSERVADURISMO SEXUAL***
+**********************************
+clear all
+
+*YOGAR
+gl code="H:\Mi unidad\Stata_ENCSS\code"
+gl data="H:\Mi unidad\Stata_ENCSS\data"
+gl log="H:\Mi unidad\Stata_ENCSS\log"
+
+*DELL
+*gl code="C:\Users\Nicolás\Google Drive\Stata_ENCSS\code"
+*gl data="C:\Users\Nicolás\Google Drive\Stata_ENCSS\data"
+*gl log="C:\Users\Nicolás\Google Drive\Stata_ENCSS\log"
+
+*log using "$log/conserva.log", replace 
+
+u "$data/piloto_21.dta", clear
+
+ssc install sortl
+
+keep nivel_educativo tramo_edad sexo t peso_t peso_o T_C18 T_C18_WEIGHT T_C19 T_C20 ///
+T_D1 T_D2 T_D3 T_D4 T_D5 T_D6 T_D7 T_D8 T_D9 T_D10 T_D11 T_D12 T_D13 T_D14 T_D15 T_D16 T_D17 T_D18 T_D19 T_D20 
+
+******chequeo de supuestos para PCC
+
+*1 normalidad (no afecta gravemente PCC)
+*2 continudidad (supuesto variable latente es continua, no afecta PCC)
+*3 amplitud de muestra (N>150)
+*4 outliers (revisarlos) 
+
+/*
+1	Totalmente en desacuerdo
+2	Bastante en desacuerdo
+3	Ni de acuerdo ni en desacuerdo
+4	Bastante de acuerdo
+5	Totalmente de acuerdo
+*/
+
+*****preparación de variables
+
+describe T_D1-T_D20
+codebook T_D1-T_D20
+tab peso_t
+
+lab var T_D1 "La educación sexual promueve que los y las adolescentes inicien su" /* alta Uniqueness */
+lab var T_D2 "Las personas Trans* deben tener los mismos derechos que el resto d" /* alta Uniqueness */
+lab var T_D3 "Está bien la adopción por parte de parejas del mismo sexo"
+lab var T_D4 "Un niño o niña puede ser bien criado por una mujer sola"
+lab var T_D5 "Hay trabajos que sólo pueden ser bien ejercidos por varones y otro"
+lab var T_D6 "Me preocuparía que uno de mis hijos o hijas me diga que es trans"
+lab var T_D7 "Un niño o niña puede ser bien criado por un varón solo"
+lab var T_D8	"La sociedad debe aceptar la homosexualidad"
+lab var T_D9	"La igualdad entre varones y mujeres ya se ha alcanzado"
+lab var T_D10	"Un niño o niña puede ser bien criado por dos varones"
+lab var T_D11	"Está bien que una mujer tenga derecho a interrumpir un embarazo si"
+lab var T_D12	"Un niño o niña puede ser bien criado por dos mujeres"
+lab var T_D13	"Es fácil hablar de sexo con una pareja" /* ojo con este item y baja correlación y son negativas */
+lab var T_D14	"Los varones tienen un mayor deseo sexual que las mujeres"
+lab var T_D15	"Hay que tener un orgasmo para que una relación sexual sea verdadera" 
+lab var T_D16	"La masturbación de las mujeres es una práctica aceptable siempre"
+lab var T_D17	"Una relación sexual sin penetración es frustrante"
+lab var T_D18	"Es necesario mantener relaciones sexuales regularmente para vivir" /* esta pregunta no tiene una dirección clara en la escala y son negativas*/
+lab var T_D19	"La masturbación de los varones es una práctica aceptable siempre" 
+lab var T_D20	"Me preocuparía que uno de mis hijos o hijas me diga que es homosexual, lesbiana o bisexual"
+
+*reverse coding 
+
+*Cuanto menor puntaje mayor conservadurismo sexual
+
+foreach x in T_D1 T_D5 T_D6 T_D9 T_D14 T_D15 T_D17 T_D20 {
+recode `x' (1=5) (2=4) (3=3) (4=2) (5=1), gen(`x'_rc)
+drop `x'
+} 
+
+*globals con dif cant de items
+
+global sinpares_items T_D2 T_D3 T_D6_rc T_D7 T_D8 T_D9_rc T_D10 T_D11 T_D12 T_D14_rc T_D15_rc T_D16 T_D17_rc T_D20_rc // final
+global sinpersonal_items T_D2 T_D3 T_D4 T_D7 T_D8 T_D9_rc T_D10 T_D11 T_D12 T_D14_rc T_D15_rc T_D17_rc 
+
+/*
+global xitems T_D1_rc T_D2 T_D3 T_D4 T_D5_rc T_D6_rc T_D7 T_D8 T_D9_rc T_D10 T_D11 T_D12 T_D13 T_D14_rc T_D15_rc T_D16 T_D17_rc T_D18 T_D19 T_D20_rc
+global cor_items T_D1_rc T_D2 T_D3 T_D4 T_D5_rc T_D6_rc T_D7 T_D8 T_D9_rc T_D10 T_D11 T_D12 T_D14_rc T_D15_rc T_D20_rc
+global corrya_items T_D1_rc T_D2 T_D3 T_D4 T_D6_rc T_D7 T_D8 T_D10 T_D11 T_D12 T_D16 T_D19 T_D20_rc
+global s1318_items T_D1_rc T_D2 T_D3 T_D4 T_D5_rc T_D6_rc T_D7 T_D8 T_D9_rc T_D10 T_D11 T_D12 T_D14_rc T_D15_rc T_D16 T_D17_rc T_D19 T_D20_rc 
+global s13181y2_items T_D3 T_D4 T_D5_rc T_D6_rc T_D7 T_D8 T_D9_rc T_D10 T_D11 T_D12 T_D14_rc T_D15_rc T_D16 T_D17_rc T_D19 T_D20_rc 
+global s13185_items T_D1_rc T_D2 T_D3 T_D4 T_D6_rc T_D7 T_D8 T_D9_rc T_D10 T_D11 T_D12 T_D14_rc T_D15_rc T_D16 T_D17_rc T_D19 T_D20_rc 
+global s131819_items T_D1_rc T_D2 T_D3 T_D4 T_D5_rc T_D6_rc T_D7 T_D8 T_D9_rc T_D10 T_D11 T_D12 T_D14_rc T_D15_rc T_D16 T_D17_rc T_D20_rc 
+global sinpaj_items T_D2 T_D3 T_D4 T_D6_rc T_D7 T_D8 T_D9_rc T_D10 T_D11 T_D12 T_D14_rc T_D15_rc T_D17_rc T_D20_rc
+global s13180501_items T_D2 T_D3 T_D4 T_D6_rc T_D7 T_D8 T_D9_rc T_D10 T_D11 T_D12 T_D14_rc T_D15_rc T_D16 T_D17_rc T_D19 T_D20_rc 
+*/
+
+******************
+***EFA************
+******************
+
+*correlaciones 
+
+pwcorr $xitems [fweight=peso_t], star(.05)
+quietly pwcorr $xitems [fweight=peso_t], star(.05) 
+matrix correl_matrix = r(C)
+matrix list correl_matrix	
+
+*chequeo de supuestos esfericidad y KMO
+
+factortest $xitems // Bartletts >0.000 (suficiente intercorrelación para analisis factorial!) y KMO > 0.50 (overlap pero no multicolinealidad!)
+
+alpha $xitems, item
+factor $xitems, pcf
+rotate // varimax para factores no correlacionados
+sortl // ordena las factors loadings 
+rotate, varimax horst blanks(.4) 
+
+
+/*Notas interpretativas: 
+
+5 factores , son bastantes, pero tienen algo de coherencia teórica 
+(f1=SSR liberal,
+f2=macho belief, 
+f3=monoyhomoparentalidad, 
+f4=masturbación libre, 
+f5=orgasmo, penetración, sexualidad activa como bienestar 
+(aunque ojo que tiene signo negativo, cor inversa con el sentido del factor, quizás porque enfasis en orgasmo y penetración valoraciones más conservadoras, y sexualidad activa como bienestar es más bien Cairo "progre"). 
+
+Unicidad: x2 alta unicidad y x1 algo alta también. 
+
+Hay un tema de "carga cruzada" en algunos items: Por ejemplo, x6 se carga en f1 y f2, y x10 y x12 se cargan en f1 y f3. No necesariamente es malo pero complica la interpretación de los factores... Hacer lo siguiente: 1) revisar interpretación teórica, 2) probar con rotación oblicua promax que permite que los items se correlacionen, o 3) directamente eliminar alguno de los items... 
+
+*/
+
+*prueba rotación oblicua
+factor $xitems, pcf
+rotate, promax horst blanks(.4)
+
+
+***************************
+*******Sin pares***********
+***************************
+
+factortest $sinpares_items 
+alpha $sinpares_items, item
+factor $sinpares_items, pcf
+rotate, varimax horst blanks(.4)
+sortl // ordena las factors loadings 
+*factores: monoyhomoparentalidad diversidad machobelief derechos
+
+
+*factor score
+
+predict factor1 factor2 factor3 factor4 
+sum factor1 factor2 factor3 factor4, detail
+
+pwcorr factor1 factor2 factor3 factor4
+egen conserva = rowmean (factor1 factor2 factor3 factor4)
+kdensity conserva // smoothed histogram
+swilk conserva
+sfrancia conserva
+
+*graph box conserva,  nooutsides
+
+
+*************************************
+***CFA*******************************
+*************************************
+
+preserve 
+	set seed 123
+	sample 50
+	gen sample1=. 
+	replace sample1=1 
+	save "$data/sample1.dta", replace
+restore
+
+preserve 
+	set seed 2345
+	sample 50
+	gen sample2=. 
+	replace sample2 =1 
+	save "$data/sample2.dta", replace
+restore
+
+**Prueba AFE
+
+*Solución 4 factores en muestra 1 y 2
+
+u "$data/sample1.dta", clear
+
+factor $sinpares_items, pcf
+rotate, varimax horst blanks(.4)
+sortl // ordena las factors loadings 
+*factores: monoyhomoparentalidad diversidad machobelief derechos
+
+sem (factor1 -> T_D3 T_D7 T_D8 T_D10 T_D12) (factor2 -> T_D6_rc T_D9_rc  T_D20_rc) (factor3 -> T_D9_rc  T_D14_rc  T_D15_rc T_D17_rc) (factor4 -> T_D2 T_D11 T_D16), latent(factor1 factor2 factor3 factor4)
+
+estat gof, stats(all)
+
+
+u "$data/sample2.dta", clear
+
+factortest $sinpares_items 
+alpha $sinpares_items, item
+factor $sinpares_items, pcf
+rotate, varimax horst blanks(.4)
+sortl // ordena las factors loadings 
+*factores: monoyhomoparentalidad diversidad machobelief derechos
+
+*Solución 3 factores en muestra 1 y 2
+
+u "$data/sample1.dta", clear
+
+factor $sinpersonal_items, pcf
+rotate, varimax horst blanks(.4)
+sortl // ordena las factors loadings  
+
+u "$data/sample2.dta", clear
+
+factor $sinpersonal_items, pcf
+rotate, varimax horst blanks(.4)
+sortl // ordena las factors loadings 
+
+
+
+sem (factor1 -> obs1 obs2) (factor2 -> obs3 obs4)
+
+
+
+++++
+
+*Pruebas preliminares 
+
+alpha $s1318_items, item
+factor $s1318_items, pcf
+rotate // varimax para factores no correlacionados
+sortl // ordena las factors loadings 
+rotate, varimax horst blanks(.4) 
+
+alpha $s13181y2_items, item
+factor $s13181y2_items, pcf
+rotate // varimax para factores no correlacionados
+sortl // ordena las factors loadings 
+rotate, varimax horst blanks(.4) 
+
+*s1318_items
+factortest $s1318_items 
+alpha $s1318_items, item
+factor $s1318_items, pcf
+rotate, varimax horst blanks(.4)
+rotate, promax horst blanks(.4)
+
+*s/ x5 
+factortest $s13185_items 
+alpha $s13185_items, item
+factor $s13185_items, pcf
+rotate, varimax horst blanks(.4)
+sortl // ordena las factors loadings 
+rotate, promax horst blanks(.4)
+
+*s/ x131819 
+
+factortest $s131819_items 
+alpha $s131819_items, item
+factor $s131819_items, pcf
+rotate, varimax horst blanks(.4)
+sortl // ordena las factors loadings 
+rotate, promax horst blanks(.4)
+
+
+*s/ s13180501_items
+
+factortest $s13180501_items 
+alpha $s13180501_items, item
+factor $s13180501_items, pcf
+rotate, varimax horst blanks(.4)
+sortl // ordena las factors loadings 
+rotate, promax horst blanks(.4)
+
+*sinpaj_items
+
+factortest $sinpaj_items 
+alpha $sinpaj_items, item
+factor $sinpaj_items, pcf
+rotate, varimax horst blanks(.4)
+
+sortl // ordena las factors loadings 
+rotate, promax horst blanks(.4)
+
+
+
+
+
+
+
+
+¿¿
+
+
+
 
