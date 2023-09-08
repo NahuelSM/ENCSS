@@ -289,23 +289,69 @@ sortl // ordena las factors loadings
 rotate, promax horst blanks(.4)
 
 
+********************ANÁLISIS FACTORIAL EXPLORATORIO**************************
 
+***Prueba $sinpares_items
 
+Muestra completa:
+*4 factores: 1. monoyhomoparentalidad 2. diversidad 3. machobelief 4. derechos
+*KMO =  0.84 ; Alpha = 0.79
+*VENTAJAS: no se repiten ítems
 
+Muestra 1:
+*KMO =  0.837 ; Alpha = 0.78   
 
+Muestra 2:
+*KMO =  0.847 ; Alpha = 0.81
 
+***Prueba $sinpersonal_items 
 
-¿¿
-*aca datos de el confirmatorio con la muestra general, sin pares (4 factores)
+Muestra completa:
+*3 factores: 1. Diversidad y derechos; 2. Mono y homoparentalidad; 3. Macho belief
+*KMO =  0.821 ; Alpha 0.768
+*SE REPITEN ITEMS: T_D10 y T_D12 en factor 1 y 2
+
+Muestra 1:
+KMO =  0.80 
+Alpha = 0.74
+
+Muestra 2:
+KMO = 0.833 
+Alpha =  0.78
+
+********************ANÁLISIS FACTORIAL CONFIRMATORIO*************************
+
+***Prueba $sinpares_items
+-Muestra completa:
 RMSEA  = 0.053
 90% CI = 0.044
 CFI = 0.956
 
-*aca datos de el confirmatorio con la muestra general, sin personal (3 factores)
+-Muestra 1:
+RMSEA = 0.042 
+90% CI, lower bound = 0.024 (Adecuado entre 0 y 0,05)
+CFI = 0.970 (adecuado en torno a 0,95 tirando a 1)
+
+-Muestra 2:
+RMSEA =  0.056 
+90% CI, lower bound = 0.042 (Adecuado entre 0 y 0,05)
+CFI = 0.958  (adecuado en torno a 0,95 tirando a 1)
+
+***Prueba $sinpersonal_items
+
+-Muestra completa:
 RMSEA = 0.62
-90% CI =  0.051
+90% CI = 0.051
 CFI = 0.95
 
+-Muestra 1:
+RMSEA = 0.045 (adecuado <= 0.05) 
+90% CI, lower bound = 0.025 (Adecuado entre 0 y 0,05)
+CFI =  0.972 (adecuado en torno a 0,95 tirando a 1)
 
+-Muestra 2:
+RMSEA =  0.054  (adecuado <= 0.05) 
+90% CI, lower bound = 0.037 (Adecuado entre 0 y 0,05)
+CFI = 0.968 (adecuado en torno a 0,95 tirando a 1)
 
 
