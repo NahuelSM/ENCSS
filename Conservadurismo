@@ -296,7 +296,16 @@ rotate, promax horst blanks(.4)
 
 
 ¿¿
-*
+*aca datos de el confirmatorio con la muestra general, sin pares (4 factores)
+RMSEA  = 0.053
+90% CI = 0.044
+CFI = 0.956
+
+*aca datos de el confirmatorio con la muestra general, sin personal (3 factores)
+RMSEA = 0.62
+90% CI =  0.051
+CFI = 0.95
+
 
 
 
