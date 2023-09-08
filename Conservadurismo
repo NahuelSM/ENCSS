@@ -218,6 +218,9 @@ factor $sinpersonal_items, pcf
 rotate, varimax horst blanks(.4)
 sortl // ordena las factors loadings 
 
+sem (factor1 -> T_D2 T_D3 T_D8 T_D10 T_D11 T_D12) (factor2 -> T_D9_rc T_D14_rc T_D15_rc T_D17_rc) (factor3 -> T_D4 T_D7 ), latent(factor1 factor2 factor3)
+estat gof, stats(all) *esto lo agregue yo*
+
 
 
 sem (factor1 -> obs1 obs2) (factor2 -> obs3 obs4)
@@ -292,7 +295,7 @@ rotate, promax horst blanks(.4)
 
 
 ¿¿
-
+*
 
 
 
